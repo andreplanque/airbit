@@ -20,7 +20,7 @@ class Airbit:
         days_in_month[1] += 1 if not int(time[0]) % 4 else 0
         days_to_month = sum(days_in_month[:int(time[1]) - 1]) * 24 * 3600
         t = list(map(int, time[2].replace('T', ':').split(':')))
-        return t[0] * 3600 * 24 + t[1] * 3600 + t[2] * 60 + t[3] + days_to_month
+        return (t[0] - 1) * 3600 * 24 + t[1] * 3600 + t[2] * 60 + t[3] + days_to_month
 
     def time_to_seconds_from_start(self):
         seconds_from_start_of_year = [self.seconds_from_start_of_year(t) for t in self.time]
