@@ -34,6 +34,7 @@ class Measurement:
         return f"{self.title}\n{self.x_label} = {self.x}\n{self.y_label} = {self.y}"
 
 
+# TODO: add time of day (rush hour etc) and day of week
 class Airbit:
     def __init__(self):
         self._data: np.ndarray = ...
