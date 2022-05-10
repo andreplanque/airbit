@@ -28,7 +28,7 @@ class Measurement:
         if show:
             plt.show()
         elif save:
-            plt.savefig(self.title.lower() + ".png")
+            plt.savefig(self.title.lower() + ".eps")
 
     def __repr__(self):
         return f"{self.title}\n{self.x_label} = {self.x}\n{self.y_label} = {self.y}"
@@ -44,12 +44,15 @@ class Airbit:
         self.hum: Measurement = ...
         self.temp: Measurement = ...
 
-    def from_file(self, data_file_name: str):
+    def from_file(self, data_file_name: str, no_time: bool = False):
         with open(data_file_name, 'r') as f:
             _data = np.loadtxt(f, dtype=str, delimiter=',')
         self._data = _data.T
         self._time = self._data[0]
-        self.time = self._time_to_seconds_from_start()
+        if no_time:
+            self.time = [n * 5 * 60 for n in range(len(self._time))]
+        else:
+            self.time = self._time_to_seconds_from_start()
         self.PM10 = Measurement(self.time, map(float, self._data[3]), 'Time [s]', 'PM10 [µg/m³]', 'PM10')
         self.PM25 = Measurement(self.time, map(float, self._data[4]), 'Time [s]', 'PM25 [µg/m³]', 'PM25')
         self.hum = Measurement(self.time, map(float, self._data[5]), 'Time [s]', 'Humidity [%]', 'Humidity')
@@ -72,8 +75,8 @@ class Airbit:
 
 def main():
     airbit = Airbit()
-    airbit.from_file('data.csv')
-    print(airbit.temp.plot)
+    airbit.from_file('data.csv', no_time=True)
+    airbit.PM10.plot(show=True, label=True)
 
 
 if __name__ == '__main__':
