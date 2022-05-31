@@ -10,11 +10,6 @@ class Measurement:
         self.y_label = y_label
         self.title = title
 
-    def day(self, day: int):
-        x = self.x[day * 12 * 24:(day+1) * 12 * 24]
-        y = self.y[day * 12 * 24:(day+1) * 12 * 24]
-        return Measurement(x, y, self.x_label, self.y_label, self.title)
-
     def plot(self, *,
              show: bool = False,
              save: bool = False,
@@ -62,7 +57,6 @@ def main():
     airbit = Airbit.from_file('LESNING.CSV')
     # pm25_anb.plot(legend=True)
     # pm10_anb2.plot(legend=True)
-    # airbit.PM25.day(1).plot(label=True)
     # plt.show()
 
 
