@@ -3,19 +3,24 @@ import matplotlib.pyplot as plt
 
 
 class Measurement:
-    def __init__(self, x, y, x_label: str = ..., y_label: str = ..., title: str = ...):
+    def __init__(self, x, y, x_label=..., y_label=..., title=...):
         self.x = list(x)
         self.y = list(y)
         self.x_label = x_label
         self.y_label = y_label
         self.title = title
 
+    def day(self, day: int):
+        x = self.x[day * 12 * 24:(day+1) * 12 * 24]
+        y = self.y[day * 12 * 24:(day+1) * 12 * 24]
+        return Measurement(x, y, self.x_label, self.y_label, self.title)
+
     def plot(self, *,
              show: bool = False,
              save: bool = False,
              label: bool = False,
              legend: bool = False,
-             loc: str = "upper left"):
+             loc: str = "upper right"):
         if label and self.x_label is not None and self.y_label is not None:
             plt.xlabel(self.x_label)
             plt.ylabel(self.y_label)
@@ -34,33 +39,31 @@ class Measurement:
         return f"{self.title}\n{self.x_label} = {self.x}\n{self.y_label} = {self.y}"
 
 
-# TODO: add time of day (rush hour etc) and day of week
 class Airbit:
-    def __init__(self):
-        self._data: np.ndarray = ...
-        self._start_time: str = ...
-        self.time: np.ndarray = ...
-        self.PM10: Measurement = ...
-        self.PM25: Measurement = ...
-        self.hum: Measurement = ...
-        self.temp: Measurement = ...
+    def __init__(self, data, offset):
+        self._data = data.T
+        self.time = [(n * 5) / (60 * 24) + offset for n in range(len(self._data[0]))]
+        self.PM10 = Measurement(self.time, map(float, self._data[3]), 'Tid [d]', 'PM10 [µg/m³]', 'PM10')
+        self.PM25 = Measurement(self.time, map(float, self._data[4]), 'Tid [d]', 'PM2.5 [µg/m³]', 'PM2.5')
+        self.hum = Measurement(self.time, map(float, self._data[5]), 'Tid [d]', 'Luftfuktighet [%]', 'Luftfuktighet')
+        self.temp = Measurement(self.time, map(float, self._data[6]), 'Tid [d]', 'Temperatur [°C]', 'Temperatur')
 
-    def from_file(self, data_file_name: str, start_time: str = ...):
+    @classmethod
+    def from_file(cls, data_file_name: str, offset: float = 0.5):
         with open(data_file_name, 'r') as f:
-            _data = np.loadtxt(f, dtype=str, delimiter=',')
-        self._data = _data.T
-        self._start_time = start_time
-        self.time = [n * 5 * 60 for n in range(len(self._data[0]))]
-        self.PM10 = Measurement(self.time, map(float, self._data[3]), 'Time [s]', 'PM10 [µg/m³]', 'PM10')
-        self.PM25 = Measurement(self.time, map(float, self._data[4]), 'Time [s]', 'PM25 [µg/m³]', 'PM25')
-        self.hum = Measurement(self.time, map(float, self._data[5]), 'Time [s]', 'Humidity [%]', 'Humidity')
-        self.temp = Measurement(self.time, map(float, self._data[6]), 'Time [s]', 'Temperature [°C]', 'Temperature')
+            data = np.loadtxt(f, dtype=str, delimiter=',')
+        return cls(data, offset)
 
 
 def main():
-    airbit = Airbit()
-    airbit.from_file('data.csv',)
-    airbit.PM10.plot(show=True, label=True)
+    pm10_anb = Measurement([0.5, 7.5], [20, 20], title="PM10 Årsverdi")
+    pm25_anb = Measurement([0.5, 7.5], [10, 10], title="PM2.5 Årsverdi")
+    pm10_anb2 = Measurement([0.5, 7.5], [50, 50], title="PM10 Døgnverdi")
+    airbit = Airbit.from_file('LESNING.CSV')
+    # pm25_anb.plot(legend=True)
+    # pm10_anb2.plot(legend=True)
+    # airbit.PM25.day(1).plot(label=True)
+    # plt.show()
 
 
 if __name__ == '__main__':
