@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class Measurement:
+class Measurement:  # Class for storing data from a measurement
     def __init__(self, x, y, x_label=..., y_label=..., title=...):
         self.x = list(x)
         self.y = list(y)
@@ -15,7 +15,7 @@ class Measurement:
              save: bool = False,
              label: bool = False,
              legend: bool = False,
-             loc: str = "upper right"):
+             loc: str = "upper right"):  # Plot the data
         if label and self.x_label is not None and self.y_label is not None:
             plt.xlabel(self.x_label)
             plt.ylabel(self.y_label)
@@ -30,14 +30,14 @@ class Measurement:
         elif save:
             plt.savefig(self.title.lower() + ".eps")
 
-    def __repr__(self):
+    def __repr__(self):  # Representation of the object
         return f"{self.title}\n{self.x_label} = {self.x}\n{self.y_label} = {self.y}"
 
 
 class Airbit:
     def __init__(self, data, offset):
         self._data = data.T
-        self.time = [(n * 5) / (60 * 24) + offset for n in range(len(self._data[0]))]
+        self.time = [(n * 5) / (60 * 24) + offset for n in range(len(self._data[0]))]  # Time in days
         self.PM10 = Measurement(self.time, map(float, self._data[3]), 'Tid [d]', 'PM10 [µg/m³]', 'PM10')
         self.PM25 = Measurement(self.time, map(float, self._data[4]), 'Tid [d]', 'PM2.5 [µg/m³]', 'PM2.5')
         self.hum = Measurement(self.time, map(float, self._data[5]), 'Tid [d]', 'Luftfuktighet [%]', 'Luftfuktighet')
